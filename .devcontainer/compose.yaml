@@ -1,0 +1,7 @@
+services:
+  devcontainer:
+    container_name: java_devcontainer_01
+    image: mcr.microsoft.com/openjdk/jdk:17-ubuntu
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
