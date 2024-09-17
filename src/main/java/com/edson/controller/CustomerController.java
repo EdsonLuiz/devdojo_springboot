@@ -3,6 +3,7 @@ package com.edson.controller;
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,5 +26,10 @@ public class CustomerController {
     @GetMapping("filterlist")
     public List<String> list(@RequestParam(required = false) List<String> names) {
         return NAMES.stream().filter(names::contains).toList();
+    }
+
+    @GetMapping("{name}")
+    public String getByName(@PathVariable(name = "name") String pName) {
+        return NAMES.stream().filter(n -> n.equalsIgnoreCase(pName)).findFirst().orElseGet(() -> "");
     }
 }
