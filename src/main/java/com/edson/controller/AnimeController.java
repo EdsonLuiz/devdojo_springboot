@@ -10,11 +10,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.edson.domain.Anime;
 
+import lombok.extern.log4j.Log4j2;
+
 @RestController
 @RequestMapping(path = {"api/v1/animes", "api/v1/animes/"})
+@Log4j2
 public class AnimeController {
     @GetMapping()
     public List<Anime> list(@RequestParam(required = false, name = "name") String pName) {
+        log.info("Request received to list all animes, param name '{}'", pName);
         if (pName == null || pName.isBlank()) {
             return Anime.getAnimes();
         }
@@ -23,6 +27,7 @@ public class AnimeController {
 
     @GetMapping("{id}")
     public Anime getById(@PathVariable(name = "id") Long pId) {
+        log.info("Request received to find anime by id '{}'", pId);
         return Anime.getAnimes().stream().filter(anime -> anime.getId().equals(pId)).findFirst().orElse(null);
     } 
 }
