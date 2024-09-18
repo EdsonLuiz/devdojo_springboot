@@ -1,9 +1,12 @@
 package com.edson.controller;
 
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,5 +32,13 @@ public class AnimeController {
     public Anime getById(@PathVariable(name = "id") Long pId) {
         log.info("Request received to find anime by id '{}'", pId);
         return Anime.getAnimes().stream().filter(anime -> anime.getId().equals(pId)).findFirst().orElse(null);
-    } 
+    }
+
+    @PostMapping
+    public Anime save(@RequestBody Anime pAnime) {
+        pAnime.setId(ThreadLocalRandom.current().nextLong(100_000));
+        log.info("Saving anime id '{}'", pAnime.getId());
+        Anime.getAnimes().add(pAnime);
+        return pAnime;
+    }
 }
