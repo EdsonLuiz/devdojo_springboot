@@ -2,7 +2,9 @@ package com.edson.controller;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,9 +16,9 @@ import com.edson.domain.Producer;
 @RequestMapping(path = {"api/v1/producers", "api/v1/producers/"})
 public class ProducerController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "x-api-version=v1")
-    public Producer save(@RequestBody Producer producer) {
+    public ResponseEntity<Producer> save(@RequestBody Producer producer) {
         producer.setId(ThreadLocalRandom.current().nextLong(100_000));
         Producer.getProducers().add(producer);
-        return producer;
+        return ResponseEntity.status(HttpStatus.CREATED).body(producer);
     }
 }
