@@ -1,6 +1,5 @@
 package com.edson.controller;
 
-import java.time.LocalDateTime;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.http.HttpStatus;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.edson.domain.Producer;
+import com.edson.mapper.ProducerMapper;
 import com.edson.request.ProducerPostRequest;
 import com.edson.response.ProducerPostResponse;
 
@@ -20,15 +20,13 @@ import com.edson.response.ProducerPostResponse;
 public class ProducerController {
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE, headers = "x-api-version=v1")
     public ResponseEntity<ProducerPostResponse> save(@RequestBody ProducerPostRequest pProducer) {
-        var producer = Producer.builder()
-            .id(ThreadLocalRandom.current().nextLong(100_000))
-            .createdAt(LocalDateTime.now())
-            .name(pProducer.getName()).build();
+
+        var mapper = ProducerMapper.INSTANCE;
+        var producer = mapper.toProducer(pProducer);
+        producer.setId(ThreadLocalRandom.current().nextLong(100_000));
+
         Producer.getProducers().add(producer);
-        var resProducer = ProducerPostResponse.builder()
-            .id(producer.getId())
-            .name(producer.getName())
-            .build();
+        var resProducer = mapper.toProducerPostResponse(producer);
         return ResponseEntity.status(HttpStatus.CREATED).body(resProducer);
     }
 }
