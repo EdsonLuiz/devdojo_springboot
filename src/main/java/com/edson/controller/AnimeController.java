@@ -1,8 +1,8 @@
 package com.edson.controller;
 
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +12,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.edson.domain.Anime;
+import com.edson.mapper.AnimeMapper;
+import com.edson.request.anime.AnimePostRequest;
+import com.edson.response.AnimePostResponse;
+import com.edson.response.anime.AnimeGetResponse;
 
 import lombok.extern.log4j.Log4j2;
 
@@ -19,26 +23,35 @@ import lombok.extern.log4j.Log4j2;
 @RequestMapping(path = {"api/v1/animes", "api/v1/animes/"})
 @Log4j2
 public class AnimeController {
+
+    private static AnimeMapper MAPPER = AnimeMapper.INSTANCE;
+
     @GetMapping()
-    public List<Anime> list(@RequestParam(required = false, name = "name") String pName) {
+    public ResponseEntity<List<AnimeGetResponse>> list(@RequestParam(required = false, name = "name") String pName) {
         log.info("Request received to list all animes, param name '{}'", pName);
+        List<Anime> animes = Anime.getAnimes();
+        var response = MAPPER.toAnimeGetResponse(animes);;
         if (pName == null || pName.isBlank()) {
-            return Anime.getAnimes();
+            return ResponseEntity.ok().body(response);
         }
-        return Anime.getAnimes().stream().filter(name -> name.getName().equalsIgnoreCase(pName)).toList();
+        response = response.stream().filter(anime -> anime.getName().equalsIgnoreCase(pName)).toList();
+        return ResponseEntity.ok().body(response);
     }
 
     @GetMapping("{id}")
-    public Anime getById(@PathVariable(name = "id") Long pId) {
+    public ResponseEntity<AnimeGetResponse> getById(@PathVariable(name = "id") Long pId) {
         log.info("Request received to find anime by id '{}'", pId);
-        return Anime.getAnimes().stream().filter(anime -> anime.getId().equals(pId)).findFirst().orElse(null);
+        var animeFound = Anime.getAnimes().stream().filter(anime -> anime.getId().equals(pId)).findFirst().orElse(null);
+        var response = MAPPER.toAnimeGetResponse(animeFound);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public Anime save(@RequestBody Anime pAnime) {
-        pAnime.setId(ThreadLocalRandom.current().nextLong(100_000));
-        log.info("Saving anime id '{}'", pAnime.getId());
-        Anime.getAnimes().add(pAnime);
-        return pAnime;
+    public ResponseEntity<AnimePostResponse> save(@RequestBody AnimePostRequest request) {
+        // log.info("Saving anime '{}'", request);
+        var anime = MAPPER.toAnime(request);
+        Anime.getAnimes().add(anime);
+        var response = MAPPER.toAnimePostResponse(anime);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }
