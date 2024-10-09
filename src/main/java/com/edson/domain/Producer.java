@@ -20,9 +20,9 @@ public class Producer {
 
     static {
         var producer01 = Producer.builder().id(1L).name("Producer01").createdAt(LocalDateTime.now()).build();
-        var producer02 = Producer.builder().id(1L).name("Producer02").createdAt(LocalDateTime.now()).build();;
-        var producer03 = Producer.builder().id(1L).name("Producer03").createdAt(LocalDateTime.now()).build();;
-        var producer04 = Producer.builder().id(1L).name("Producer04").createdAt(LocalDateTime.now()).build();;
+        var producer02 = Producer.builder().id(2L).name("Producer02").createdAt(LocalDateTime.now()).build();;
+        var producer03 = Producer.builder().id(3L).name("Producer03").createdAt(LocalDateTime.now()).build();;
+        var producer04 = Producer.builder().id(4L).name("Producer04").createdAt(LocalDateTime.now()).build();;
         producers.addAll(List.of(producer01, producer02, producer03, producer04));
     }
 
