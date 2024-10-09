@@ -3,15 +3,18 @@ package com.edson.controller;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.springframework.http.HttpStatus;
+import static org.springframework.http.HttpStatus.*;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.edson.domain.Producer;
 import com.edson.mapper.ProducerMapper;
@@ -48,6 +51,14 @@ public class ProducerController {
 
         Producer.getProducers().add(producer);
         var resProducer = MAPPER.toProducerPostResponse(producer);
-        return ResponseEntity.status(HttpStatus.CREATED).body(resProducer);
+        return ResponseEntity.status(CREATED).body(resProducer);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("Request received to delete producer with id '{}'", id);
+        var producer = Producer.getProducers().stream().filter(p -> p.getId().equals(id)).findFirst().orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Producer not found to be deleted."));
+        Producer.getProducers().remove(producer);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,7 +1,7 @@
 package com.edson.controller;
 
 import java.util.List;
-import org.springframework.http.HttpStatus;
+import static org.springframework.http.HttpStatus.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.edson.domain.Anime;
 import com.edson.mapper.AnimeMapper;
@@ -41,7 +42,7 @@ public class AnimeController {
     @GetMapping("{id}")
     public ResponseEntity<AnimeGetResponse> getById(@PathVariable(name = "id") Long pId) {
         log.info("Request received to find anime by id '{}'", pId);
-        var animeFound = Anime.getAnimes().stream().filter(anime -> anime.getId().equals(pId)).findFirst().orElse(null);
+        var animeFound = Anime.getAnimes().stream().filter(anime -> anime.getId().equals(pId)).findFirst().orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Anime not found."));
         var response = MAPPER.toAnimeGetResponse(animeFound);
         return ResponseEntity.ok(response);
     }
@@ -52,6 +53,6 @@ public class AnimeController {
         var anime = MAPPER.toAnime(request);
         Anime.getAnimes().add(anime);
         var response = MAPPER.toAnimePostResponse(anime);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.status(CREATED).body(response);
     }
 }
