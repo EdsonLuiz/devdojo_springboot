@@ -3,6 +3,7 @@ package com.edson.controller;
 import java.util.List;
 import static org.springframework.http.HttpStatus.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,5 +55,14 @@ public class AnimeController {
         Anime.getAnimes().add(anime);
         var response = MAPPER.toAnimePostResponse(anime);
         return ResponseEntity.status(CREATED).body(response);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        log.info("Request received to delete anime with id '{}'", id);
+        var anime = Anime.getAnimes().stream().filter(a -> a.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Anime not found to be deleted."));
+        Anime.getAnimes().remove(anime);
+        return ResponseEntity.noContent().build();
     }
 }
