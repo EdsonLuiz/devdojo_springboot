@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,8 +15,11 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.edson.domain.Anime;
+import com.edson.domain.Producer;
 import com.edson.mapper.AnimeMapper;
 import com.edson.request.anime.AnimePostRequest;
+import com.edson.request.anime.AnimePutRequest;
+import com.edson.request.producer.ProducerPutRequest;
 import com.edson.response.AnimePostResponse;
 import com.edson.response.anime.AnimeGetResponse;
 
@@ -63,6 +67,20 @@ public class AnimeController {
         var anime = Anime.getAnimes().stream().filter(a -> a.getId().equals(id)).findFirst()
                 .orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Anime not found to be deleted."));
         Anime.getAnimes().remove(anime);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> replace(@RequestBody AnimePutRequest request) {
+        log.info("Request received to replace anime '{}'", request);
+        var animeToRemove = Anime.getAnimes()
+            .stream()
+            .filter(a -> a.getId().equals(request.getId())).findFirst().orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Anime not found to be updated."));
+
+        var animeUpdated = MAPPER.toAnime(request);
+
+        Anime.getAnimes().remove(animeToRemove);
+        Anime.getAnimes().add(animeUpdated);
         return ResponseEntity.noContent().build();
     }
 }

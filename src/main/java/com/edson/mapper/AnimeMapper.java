@@ -8,6 +8,7 @@ import org.mapstruct.factory.Mappers;
 
 import com.edson.domain.Anime;
 import com.edson.request.anime.AnimePostRequest;
+import com.edson.request.anime.AnimePutRequest;
 import com.edson.response.AnimePostResponse;
 import com.edson.response.anime.AnimeGetResponse;
 
@@ -16,6 +17,8 @@ public interface AnimeMapper{
     AnimeMapper INSTANCE = Mappers.getMapper(AnimeMapper.class);
     @Mapping(target = "id", expression = "java(java.util.concurrent.ThreadLocalRandom.current().nextLong(100_000))")
     Anime toAnime(AnimePostRequest request);
+
+    Anime toAnime(AnimePutRequest request);
 
     AnimePostResponse toAnimePostResponse(Anime anime);
     AnimeGetResponse toAnimeGetResponse(Anime anime);
