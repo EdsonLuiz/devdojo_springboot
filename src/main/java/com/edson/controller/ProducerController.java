@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.edson.domain.Producer;
 import com.edson.mapper.ProducerMapper;
 import com.edson.request.ProducerPostRequest;
+import com.edson.request.producer.ProducerPutRequest;
 import com.edson.response.ProducerPostResponse;
 import com.edson.response.producer.ProducerGetResponse;
 
@@ -59,6 +61,20 @@ public class ProducerController {
         log.info("Request received to delete producer with id '{}'", id);
         var producer = Producer.getProducers().stream().filter(p -> p.getId().equals(id)).findFirst().orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Producer not found to be deleted."));
         Producer.getProducers().remove(producer);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping
+    public ResponseEntity<Void> replace(@RequestBody ProducerPutRequest request) {
+        log.info("Request received to replace producer '{}'", request);
+        var producerToRemove = Producer.getProducers()
+            .stream()
+            .filter(p -> p.getId().equals(request.getId())).findFirst().orElseThrow(() -> new ResponseStatusException(NOT_FOUND, "Producer not found to be updated."));
+
+        var producerUpdated = MAPPER.toProducer(request, producerToRemove.getCreatedAt());
+
+        Producer.getProducers().remove(producerToRemove);
+        Producer.getProducers().add(producerUpdated);
         return ResponseEntity.noContent().build();
     }
 }
